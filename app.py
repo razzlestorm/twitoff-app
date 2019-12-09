@@ -1,28 +1,40 @@
+from decouple import config
 from faker import Faker
-from flask import Flask
-from .models import db, User, Tweet
-import uuid
+from flask import Flask, render_template, request
+from .models import DB, User, Tweet
+from .twitter import *
 
 
 def create_app():
         app = Flask(__name__)
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///my_db.sqlite'
-        db.init_app(app)
+        app.config['SQLALCHEMY_DATABASE_URI'] = config('DATABASE_URL')
+        app.config['ENV'] = config('ENV')
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+        DB.init_app(app)
 
 
         @app.route('/')
         def index():
-            rand_name = str(uuid.uuid4())
-            rand_u = User(name=rand_name)
-            rand_tweet = Faker()
-            db.session.add(rand_u)
-            #db.session.add(rand_tweet.text())
-            db.session.commit()
-            return 'Index Page'
+            #figure out why users aren't displaying
+            users = User.query.all()
+            return render_template('base.html', title='homepage', users=users)
 
-        @app.route('/hello')
-        def hello():
-            return render_template('base.html', title='hello')
+        @app.route('/result', methods=['POST', 'GET'])
+        # This runs the function that adds user data to db, then shows said username.
+        # TODO: Actually show user's ten latest tweets.
+        def result():
+            if request.method == 'POST':
+                username = request.form
+                user = TWITTER.get_user(username['handle'])
+                embedded_tweet_to_db(user)
+                return render_template('result.html', title='Results!', username=username)
+
+        # DELETE THE FOLLOWING FOR PRODUCTION
+        @app.route('/reset')
+        def reset():
+            DB.drop_all()
+            DB.create_all()
+            return render_template('base.html', title='DB Reset!', users=[])
 
         return app
 
