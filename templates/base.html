@@ -6,18 +6,13 @@
 
   <body>
     <h1>TwitOff!</h1>
-    <p>Content for TwitOff will go here...</p>
-    <form action = "result" method = "POST">
-    <p>Input the twitter handle you wish to find:</p>
-    <p>Twitter Username: <input type="text" name="handle" /></p>
-    <input type="submit" value="Submit">
-    </form>
-
-    <ul>
-      {% for user in users %}
-      <li>{{ user.name }}</li>
-      {% endfor %}
-    </ul>
+    {% block content %}
+      <form action= "/user" method = "POST">
+      <p>Input the twitter handle you wish to find:</p>
+      <p>Twitter Username: <input type="text" name="handle" placeholder='User to add'/></p>
+      <input type="submit" value="Add User">
+      </form>
+    {% endblock %}
   </body>
 
 </html>
