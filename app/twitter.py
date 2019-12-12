@@ -36,40 +36,15 @@ def add_or_update_user(handle):
                             embedding=embedding)
             db_user.tweets.append(db_tweet)
             DB.session.add(db_tweet)
-            db_user.tweets.append(db_tweet)
+
     except Exception as e:
         print(f'Error processing {handle}: {e}')
         raise e
     else:
         DB.session.commit()
 
-        def update_all_users():
-            for user in User.query.all():
-                add_or_update_user(user.name)
 
-'''
-V1 selfmade
-def embedded_tweet_to_db(t_user):
-    """
-    Gets the tweets of a user and appends their latest 200 tweets (excluding
-    retweets and replies) to the database. Appends the id, text,
-    basilica embedding, and Twitter user ID in that order to the DB.
-
-    Only needs the twitter handle as an argument.
-    """
-    tweets = t_user.timeline(count=200, exclude_replies=True,
-                            include_rts=False, tweet_mode='extended')
-
-    db_user = User(id=t_user.id, handle=t_user.screen_name,
-                name=t_user.name, newest_tweet_id=tweets[0].id)
-
-    for tweet in tweets:
-        embedding = BASILICA.embed_sentence(tweet.full_text, model='twitter')
-        db_tweet = Tweet(id=tweet.id, text=tweet.full_text[:300],
-                        embedding=embedding)
-        DB.session.add(db_tweet)
-        db_user.tweets.append(db_tweet)
-    DB.session.add(db_user)
-    DB.session.commit()
-
-    '''
+def update_all_users():
+    """Update all Tweets for all Users in the User table."""
+    for user in User.query.all():
+        add_or_update_user(user.name)
