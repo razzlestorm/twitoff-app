@@ -25,6 +25,19 @@ def create_app():
             DB.create_all()
             return render_template('base.html', title='DB Reset!', users=[])
 
+        @app.route('/compare', methods=['POST'])
+        def compare(message=''):
+            user1 = request.values['user1']
+            user2 = request.values['user2']
+            tweet_text = request.values['tweet_text']
+
+            if user1 == user2:
+                message = 'Cannot compare a user to themselves!'
+            else:
+                prediction = predict_user(user1, user2, tweet_text)
+                message = f'{tweet_text} is more likely to be said by {} than {}'.format(request.values['tweet_text'], user1 if prediction else user2, user2 if prediction else user1)
+            return render_template('prediction.html', title='Prediction', message=message)
+
         @app.route('/user', methods=['POST'])
         @app.route('/user/<handle>', methods=['GET'])
         def user(handle=None, message=''):
@@ -42,6 +55,11 @@ def create_app():
                 tweets = []
             return render_template('user.html', title=handle,
                                     tweets=tweets, message=message)
+
+        @app.route('/update')
+        def update():
+            update_all_users()
+            return render_template('base.html', users=User.query.all(), title='All Tweets updated')
 
 
         return app

@@ -43,6 +43,10 @@ def add_or_update_user(handle):
     else:
         DB.session.commit()
 
+        def update_all_users():
+            for user in User.query.all():
+                add_or_update_user(user.name)
+
 '''
 V1 selfmade
 def embedded_tweet_to_db(t_user):
