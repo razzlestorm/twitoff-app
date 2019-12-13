@@ -1,1 +1,1 @@
-web: gunicorn twitoff_app.app --log-file -
+web: gunicorn twitoff_app:app --log-file -
